@@ -1,0 +1,26 @@
+# Terraform Variables Example File
+# Copy this to terraform.tfvars and update with your values
+
+# Project Configuration
+project_name = "coursebundler"  # Name of your project
+environment  = "dev"           # Environment: dev, staging, or prod
+
+# AWS Configuration
+aws_region         = "us-east-1"  # AWS region for deployment
+availability_zones = ["us-east-1a", "us-east-1b"]  # Availability zones
+
+# Network Configuration
+vpc_cidr = "10.0.0.0/16"  # CIDR block for VPC
+
+# Container Configuration
+container_port = 5001  # Port your backend container listens on
+container_cpu  = 512   # CPU units (1024 = 1 vCPU)
+container_memory = 1024  # Memory in MB
+
+# ECS Service Configuration
+desired_count = 2  # Initial number of ECS tasks
+min_capacity  = 2  # Minimum tasks for auto scaling
+max_capacity  = 6  # Maximum tasks for auto scaling
+
+# Monitoring Configuration
+alert_email = "your-email@example.com"  # Email for CloudWatch alerts
