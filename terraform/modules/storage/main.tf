@@ -8,6 +8,7 @@ resource "random_id" "bucket_suffix" {
 # S3 Bucket for Frontend
 resource "aws_s3_bucket" "frontend" {
   bucket = "${var.project_name}-frontend-${random_id.bucket_suffix.hex}"
+  force_destroy = true
 
   tags = merge(
     var.common_tags,

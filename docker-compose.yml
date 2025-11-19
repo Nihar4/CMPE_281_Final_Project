@@ -29,8 +29,8 @@ services:
       - PORT=5001
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - MONGO_URI=${MONGO_URI:-mongodb+srv://Nihar123:Nihar123@cluster0.9srg0my.mongodb.net/MyProject?retryWrites=true}
-      - JWT_SECRET=${JWT_SECRET:-qwertyuiopasdfghjklzxcvbnmqwertyuioplkjhgfdsasdbnm}
+      - MONGO_URI=${MONGO_URI}
+      - JWT_SECRET=${JWT_SECRET}
       - FRONTEND_URL=http://localhost:3000
     env_file:
       - ./backend/config/config.env

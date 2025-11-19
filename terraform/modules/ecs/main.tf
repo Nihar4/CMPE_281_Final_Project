@@ -53,29 +53,51 @@ resource "aws_iam_role" "ecs_task_execution" {
   )
 }
 
-# Attach AWS managed policy
-resource "aws_iam_role_policy_attachment" "ecs_task_execution" {
-  role       = aws_iam_role.ecs_task_execution.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
-}
+# Custom policy for ECS Task Execution (Least Privilege)
+# Data sources for dynamic ARN construction
+data "aws_region" "current" {}
+data "aws_caller_identity" "current" {}
 
-# Custom policy for ECR access
-resource "aws_iam_role_policy" "ecr_access" {
-  name = "${var.project_name}-${var.environment}-ecr-access"
+# Custom policy for ECS Task Execution (Least Privilege)
+resource "aws_iam_role_policy" "ecs_task_execution_policy" {
+  name = "${var.project_name}-${var.environment}-ecs-execution-policy"
   role = aws_iam_role.ecs_task_execution.id
 
   policy = jsonencode({
     Version = "2012-10-17"
-    Statement = [{
-      Effect = "Allow"
-      Action = [
-        "ecr:GetAuthorizationToken",
-        "ecr:BatchCheckLayerAvailability",
-        "ecr:GetDownloadUrlForLayer",
-        "ecr:BatchGetImage"
-      ]
-      Resource = "*"
-    }]
+    Statement = [
+      {
+        Sid    = "ECRAuthToken"
+        Effect = "Allow"
+        Action = ["ecr:GetAuthorizationToken"]
+        Resource = "*"
+      },
+      {
+        Sid    = "ECRImagePull"
+        Effect = "Allow"
+        Action = [
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:BatchGetImage"
+        ]
+        Resource = "arn:aws:ecr:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:repository/${var.project_name}-backend"
+      },
+      {
+        Sid    = "CloudWatchLogs"
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Resource = "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/ecs/${var.project_name}-*:*"
+      },
+      {
+        Sid    = "SecretsManager"
+        Effect = "Allow"
+        Action = ["secretsmanager:GetSecretValue"]
+        Resource = "arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:secret:${var.project_name}/${var.environment}/*"
+      }
+    ]
   })
 }
 
@@ -117,6 +139,24 @@ resource "aws_iam_role_policy" "cloudwatch_logs" {
       ]
       Resource = "${aws_cloudwatch_log_group.ecs.arn}:*"
     }]
+  })
+}
+
+# Policy for ECS Task to access Secrets Manager
+resource "aws_iam_role_policy" "ecs_task_policy" {
+  name = "${var.project_name}-${var.environment}-ecs-task-policy"
+  role = aws_iam_role.ecs_task.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "SecretsManager"
+        Effect = "Allow"
+        Action = ["secretsmanager:GetSecretValue"]
+        Resource = "arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:secret:${var.project_name}/${var.environment}/*"
+      }
+    ]
   })
 }
 
