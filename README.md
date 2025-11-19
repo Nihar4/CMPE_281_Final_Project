@@ -101,13 +101,30 @@ cd Final_Project
 
 ### Step 2: Configure AWS Credentials
 
+You have two options to configure AWS credentials:
+
+#### Option 1: AWS CLI (Recommended)
 ```bash
 aws configure
 # Enter your AWS Access Key ID
 # Enter your AWS Secret Access Key
-# Enter default region (e.g., us-east-1)
+# Enter default region (e.g., us-west-1)
 # Enter default output format (json)
 ```
+
+#### Option 2: Setup Script (For Local Development)
+```bash
+# Copy the setup script template
+cp .aws_credentials_setup.sh.example .aws_credentials_setup.sh
+
+# Edit the file with your actual credentials
+nano .aws_credentials_setup.sh
+
+# Source the credentials
+source .aws_credentials_setup.sh
+```
+
+**Important**: The `.aws_credentials_setup.sh` file is excluded from git by `.gitignore` for security reasons. Never commit actual AWS credentials to version control.
 
 ### Step 3: Update Terraform Variables
 
