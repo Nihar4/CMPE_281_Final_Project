@@ -1,0 +1,32 @@
+# Node
+node_modules/
+npm-debug.log
+.env
+.env.local
+
+# Terraform
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+*.tfvars
+!terraform.tfvars.example
+.terraform.lock.hcl
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# AWS Credentials
+.aws_credentials_setup.sh
+
+# Documentation files
+md_files/
